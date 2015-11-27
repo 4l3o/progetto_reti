@@ -16,7 +16,7 @@ int getServerInfo(struct sockaddr_in *my_addr , int argc , char* argv)
       port=argv[3];
     }
   //traduco i valori presi in una struttura che rappresenta un indirizzo di rete
-  memset(my_addr,0,sizeof(my_addr));
+  memset(my_addr,0,sizeof(*my_addr));
   my_addr->sin_family= AF_INET;
   my_addr->sin_addr.s_addr = htonl(ip);
   my_addr->sin_port=htons(port);
