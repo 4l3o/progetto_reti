@@ -20,6 +20,7 @@ int main(int argc , char*argv[])
   struct sockaddr_in srvr_addr;
   //int ret = getServerInfo(&srvr_addr , argc ,&argv);
   int ret =1;
+  int sk;
   if(argc < 3)
     {
       ret =1;
@@ -41,6 +42,13 @@ int main(int argc , char*argv[])
       printf("\r\n");
       printf("port:%u",srvr_addr.sin_port);
       printf("\r\n");
+      printf("connessione al server\r\n");
+      sk = socket(AF_INET ,SOCK_STREAM,0);
+      ret = connect(sk,(struct sockaddr *)&srvr_addr , sizeof(srvr_addr));
+      if(ret == 0)
+	{
+	  printf("CONNESSSO!!!!!!!!\\r\n");
+	}
       return 0;
     }
   else
