@@ -33,11 +33,17 @@ int main (int argc  ,char*argv[] )
 	{
 	  printf("connessione con il server %s (%u) effettuata con successo\r\n",argv[1],atoi(argv[2]));
 	  helper();
-	  //int loopCond = true;
-	  /** while(loopCondition)
+	  int loopCond = 0;
+	   while(loopCond == 0)
 	    {
-	      scanf();
-	      }**/
+	      char cmd[10];
+	      int i;
+	      scanf("%10s %i",cmd,&i);
+	      if(strcmp(cmd , "!quit") == 0 )
+		{
+		  loopCond = 1;
+		}
+	    }
 	}
       else
 	{
