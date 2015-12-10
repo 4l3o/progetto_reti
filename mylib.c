@@ -3,7 +3,7 @@
  **/
 void helper()
 {
-  printf("sono disponibili i seguenti comandi :\r\n");
+  printf("\r\n Sono disponibili i seguenti comandi :\r\n");
   printf(" * !help --> mostra l'elenco dei comandi disponibili\r\n");
   printf(" * !who --> mostra l'elenco dei client connessi al server\r\n");
   printf(" * !connect <nome_client> --> avvia una partita con l'utente nome_client\r\n");

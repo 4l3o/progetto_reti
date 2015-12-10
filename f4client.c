@@ -33,13 +33,17 @@ int main (int argc  ,char*argv[] )
 	{
 	  printf("connessione con il server %s (%u) effettuata con successo\r\n",argv[1],atoi(argv[2]));
 	  helper();
-	  int loopCond = true;
-	  char cmnd_strng [25];
+	  int loopCond = 0;
+	   while(loopCond == 0)
 	  while(loopCondition)
 	    {
 	      fgets(&cmnd_strng , 25 , stdin);
 	      parse_cmnd_strng(&cmnd_strng);
 	      
+	    }
+		{
+		  loopCond = 1;
+		}
 	    }
 	}
       else
