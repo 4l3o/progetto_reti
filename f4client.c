@@ -33,18 +33,45 @@ int main (int argc  ,char*argv[] )
 	{
 	  printf("connessione con il server %s (%u) effettuata con successo\r\n",argv[1],atoi(argv[2]));
 	  helper();
+	  char cmnd_string[25];
 	  int loopCond = 0;
-	   while(loopCond == 0)
-	  while(loopCondition)
-	    {
-	      fgets(&cmnd_strng , 25 , stdin);
-	      parse_cmnd_strng(&cmnd_strng);
-	      
-	    }
-		{
-		  loopCond = 1;
-		}
-	    }
+	  while(loopCond == 0)
+	     {
+		fgets(cmnd_string , 25 , stdin);
+		int action ;
+		action = parse_cmd_strng(cmnd_string);
+		switch (action)
+		  {
+		  case 1:
+		    printf("disconnessione in corso \n\r");
+		    loopCond = 1;
+		    break;
+		    
+		  case 2:
+		    
+		    break;
+		    
+		  case 3:
+
+		    break;
+		  case 4:
+		    break;
+
+		  case 5:
+		    break;
+
+		  case 6:
+		    break;
+
+		  case 7:
+		    break;
+
+		  case 0:
+		    printf("comando non valido , digitare !help per visualizzare una lista di comandi validi");
+		    break;
+		  }
+		// printf("l'utente ha digitato :%s il comando tradotto è: %i \r\n",cmnd_string,action);
+	     }
 	}
       else
 	{
