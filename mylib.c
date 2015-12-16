@@ -17,7 +17,7 @@ void helper()
 int init_srvr_addr(struct sockaddr_in*srvr_addr , char*ip , char*port)
 {
   int ok;
-  memset(srvr_addr,0,sizeof(srvr_addr));
+  memset(srvr_addr,0,sizeof(*srvr_addr));
   srvr_addr->sin_family=AF_INET;
   srvr_addr->sin_port = htons(atoi(port));
   ok = inet_pton(AF_INET,ip,&srvr_addr->sin_addr.s_addr);

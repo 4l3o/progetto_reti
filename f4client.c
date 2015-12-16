@@ -32,20 +32,29 @@ int main (int argc  ,char*argv[] )
       if(ret == 0 )
 	{
 	  printf("connessione con il server %s (%u) effettuata con successo\r\n",argv[1],atoi(argv[2]));
-	  helper();
+	  char usrName[20];
+	  int udpPort;
 	  char cmnd_string[25];
+	  printf("Inserisci il tuo nome:");
+	  fgets(cmnd_string,24,stdin);
+	  sscanf(cmnd_string,"%19s",usrName);
+	  printf("Inserisci la porta UDP di ascolto:");
+	  fgets(cmnd_string,24,stdin);
+	  sscanf(cmnd_string,"%4i",&udpPort);
+	  printf("nome %s porta %i",usrName,udpPort);
 	  int loopCond = 0;
+	  helper();
 	  while(loopCond == 0)
 	     {
-		fgets(cmnd_string , 25 , stdin);
-		int action ;
-		action = parse_cmd_strng(cmnd_string);
-		switch (action)
-		  {
-		  case 1:
-		    printf("disconnessione in corso \n\r");
-		    loopCond = 1;
-		    break;
+	       fgets(cmnd_string , 25 , stdin);
+	       int action ;
+	       action = parse_cmd_strng(cmnd_string);
+	       switch (action)
+		 {
+		 case 1:
+		   printf("disconnessione in corso \n\r");
+		   loopCond = 1;
+		   break;
 		    
 		  case 2:
 		    
@@ -67,7 +76,7 @@ int main (int argc  ,char*argv[] )
 		    break;
 
 		  case 0:
-		    printf("comando non valido , digitare !help per visualizzare una lista di comandi validi");
+		    printf("comando non valido , digitare !help per visualizzare una lista di comandi validi\r\n");
 		    break;
 		  }
 		// printf("l'utente ha digitato :%s il comando tradotto è: %i \r\n",cmnd_string,action);
