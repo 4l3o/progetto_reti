@@ -61,3 +61,14 @@ int parse_cmd_strng(char * string)
       return 0;
     }
 }
+
+int srvrSend(char * str , int socket)
+{
+  // int dimension = sizeof(str)/sizeof(str[0]);
+  int ret = 0;
+  int dimension = 144;
+  //inviare la dimensione
+  ret = send(socket ,(char *)&dimension,sizeof(int), 0);
+  //inviare la stringa
+  return 0;
+}

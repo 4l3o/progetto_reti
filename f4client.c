@@ -41,7 +41,7 @@ int main (int argc  ,char*argv[] )
 	  printf("Inserisci la porta UDP di ascolto:");
 	  fgets(cmnd_string,24,stdin);
 	  sscanf(cmnd_string,"%4i",&udpPort);
-	  printf("nome %s porta %i",usrName,udpPort);
+	  srvrSend(usrName ,sk);
 	  int loopCond = 0;
 	  helper();
 	  while(loopCond == 0)
