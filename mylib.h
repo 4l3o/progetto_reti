@@ -9,4 +9,4 @@ int init_srvr_addr(struct sockaddr_in *srvr_addr, char*ip , char*port);
 int parse_cmd_string(char * string);
 
 //invia una stringa al server
-int srvrSend(char * str , int socket );
+int srvrSend(char * str ,int dimension, int socket );

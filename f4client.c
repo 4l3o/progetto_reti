@@ -34,15 +34,22 @@ int main (int argc  ,char*argv[] )
 	  printf("connessione con il server %s (%u) effettuata con successo\r\n",argv[1],atoi(argv[2]));
 	  char usrName[20];
 	  int udpPort;
+	  int len;
 	  char cmnd_string[25];
-	  printf("Inserisci il tuo nome:");
-	  fgets(cmnd_string,24,stdin);
-	  sscanf(cmnd_string,"%19s",usrName);
+	  printf("Inserisci il tuo nome (max 20 caratteri):");
+	  fgets(cmnd_string,20,stdin);
+	  sscanf(cmnd_string,"%19s%n",usrName,&len);
 	  printf("Inserisci la porta UDP di ascolto:");
 	  fgets(cmnd_string,24,stdin);
 	  sscanf(cmnd_string,"%4i",&udpPort);
-	  srvrSend(usrName ,sk);
+	  srvrSend(usrName ,len,sk);
 	  int loopCond = 0;
+	  fdset fd_master,fd;
+	  FD_ZERO(&fd_master);
+	  FD_ZERO(&fd);
+	  FD_SET(0,&fd_master);
+	  FD_SET(sk,&fd_master);
+	  //aggiungere select
 	  helper();
 	  while(loopCond == 0)
 	     {
@@ -78,7 +85,11 @@ int main (int argc  ,char*argv[] )
 		  case 0:
 		    printf("comando non valido , digitare !help per visualizzare una lista di comandi validi\r\n");
 		    break;
-		  }
+
+		  default :
+		    printf("comando non valido , digitare !help per visualizzare una lista di comandi validi\r\n");
+		    
+		 }
 		// printf("l'utente ha digitato :%s il comando tradotto è: %i \r\n",cmnd_string,action);
 	     }
 	}
