@@ -44,53 +44,66 @@ int main (int argc  ,char*argv[] )
 	  sscanf(cmnd_string,"%4i",&udpPort);
 	  srvrSend(usrName ,len,sk);
 	  int loopCond = 0;
-	  fdset fd_master,fd;
+	  fd_set fd_master,fd;
 	  FD_ZERO(&fd_master);
 	  FD_ZERO(&fd);
 	  FD_SET(0,&fd_master);
 	  FD_SET(sk,&fd_master);
-	  //aggiungere select
 	  helper();
 	  while(loopCond == 0)
 	     {
-	       fgets(cmnd_string , 25 , stdin);
-	       int action ;
-	       action = parse_cmd_strng(cmnd_string);
-	       switch (action)
+	       fd = fd_master;
+	       if(select(sk+1,&fd,NULL,NULL,NULL) == -1)
 		 {
-		 case 1:
-		   printf("disconnessione in corso \n\r");
-		   loopCond = 1;
-		   break;
-		    
-		  case 2:
-		    
-		    break;
-		    
-		  case 3:
-
-		    break;
-		  case 4:
-		    break;
-
-		  case 5:
-		    break;
-
-		  case 6:
-		    break;
-
-		  case 7:
-		    break;
-
-		  case 0:
-		    printf("comando non valido , digitare !help per visualizzare una lista di comandi validi\r\n");
-		    break;
-
-		  default :
-		    printf("comando non valido , digitare !help per visualizzare una lista di comandi validi\r\n");
-		    
+		   perror("select() error");
+		   exit(1);
 		 }
-		// printf("l'utente ha digitato :%s il comando tradotto è: %i \r\n",cmnd_string,action);
+	       if(FD_ISSET(sk,&fd))
+		 {
+		   //chiedere all'utente se vuole accettare la partita
+		 }
+	       if(FD_ISSET(0,&fd))
+		 {
+		   fgets(cmnd_string , 25 , stdin);
+		   int action ;
+		   action = parse_cmd_strng(cmnd_string);
+		   switch (action)
+		     {
+		     case 1:
+		       printf("disconnessione in corso \n\r");
+		       loopCond = 1;
+		       break;
+		       
+		     case 2:
+		       
+		       break;
+		    
+		     case 3:
+		       
+		       break;
+		     case 4:
+		       break;
+		       
+		     case 5:
+		       break;
+		       
+		     case 6:
+		       break;
+		       
+		     case 7:
+		       break;
+		       
+		     case 0:
+		       printf("comando non valido , digitare !help per visualizzare una lista di comandi validi\r\n");
+		       break;
+		       
+		     default :
+		       printf("comando non valido , digitare !help per visualizzare una lista di comandi validi\r\n");
+		       break;
+		     }
+	       // printf("l'utente ha digitato :%s il comando tradotto è: %i \r\n",cmnd_string,action);
+
+		 }
 	     }
 	}
       else
