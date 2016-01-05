@@ -62,13 +62,64 @@ int parse_cmd_strng(char * string)
     }
 }
 
-int srvrSend(char * str , int socket)
+int srvrSend(unsigned int op ,char * str ,int dimension ,int socket)
 {
-  // int dimension = sizeof(str)/sizeof(str[0]);
   int ret = 0;
-  int dimension = 144;
+  //invio l'operazione
+  ret = send(socket ,&op ,sizeof(int),0);
   //inviare la dimensione
-  ret = send(socket ,(char *)&dimension,sizeof(int), 0);
+  ret = send(socket ,&dimension ,sizeof(int),0);
+  //ret = send(socket ,str ,dimension, 0);
   //inviare la stringa
-  return 0;
+  ret = send(socket ,&str ,dimension ,0 );
+  if(ret >0)
+    {
+      printf("invio username\r\n");
+      ret = send(socket,str,dimension,0);
+      return ret;
+    }
+  return ret;
 }
+
+int send_op(unsigned short op, int socket)
+{
+  int ret=0;
+  ret = send(socket,&op,sizeof(unsigned short int),0);
+  if(ret > 0)
+    {
+      return 0;
+    }
+  else
+    {
+      return -1;
+    }
+}
+
+int send_len(int len , int socket )
+{
+  int ret = 0;
+  ret = send(socket ,&len , sizeof(int),0);
+  if(ret > 0 )
+    {
+      return 0;
+    }
+  else
+    {
+      return -1;
+    }
+}
+
+int send_msg(int len , int socket ,char * msg)
+{
+  int ret = 0;
+  ret = send(socket , msg , len*sizeof(char), 0);
+  if(ret > 0 )
+    {
+      return 0;
+    }
+  else
+    {
+      return 1;
+    }
+}
+
