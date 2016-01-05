@@ -50,13 +50,23 @@ int main(int argc , char*argv[])
       cn_sk = accept(sk,(struct sockaddr * )&cl_addr,&cl_addr_len);
       char r[20];
       int dim;
-      recv(cn_sk,&dim,sizeof(int),0);
+      //recv(cn_sk,&dim,sizeof(int),0);
       //recv(cn_sk,r,5*sizeof(char),0);
-      printf("leggo %i bit\r\n",dim);
+      //printf("leggo %i bit\r\n",dim);
       //printf("connesso utente :%s\r\n",r);
-      recv(cn_sk,r,dim*sizeof(char),0);
-      r[dim]='\0';
+      // recv(cn_sk,r,dim*sizeof(char),0);
+      unsigned short op ;
+      int len;
+      recv(cn_sk,&op,sizeof(unsigned short int),0);
+      //printf("passo 1\r\n");
+      recv(cn_sk,&len,sizeof(int),0);
+      //printf("passo 2\r\n");
+      recv(cn_sk,r,len*sizeof(char),0);
+      r[len]='\0';
       printf("%s si è connesso!!!\r\n",r);
+      printf("comando: %hu\r\n",op);
+      printf("lunghezza: %i\r\n",len);
+      printf("nome: %s\r\n",r);
     }
   else
     {

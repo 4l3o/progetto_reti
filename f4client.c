@@ -42,7 +42,11 @@ int main (int argc  ,char*argv[] )
 	  printf("Inserisci la porta UDP di ascolto:");
 	  fgets(cmnd_string,24,stdin);
 	  sscanf(cmnd_string,"%4i",&udpPort);
-	  srvrSend(usrName ,len,sk);
+	  //srvrSend(1 ,usrName ,len ,sk);
+	  send_op(1,sk);
+	  printf("%i\r\n",len);
+	  send_len(len,sk);
+	  send_msg(len,sk,usrName);
 	  int loopCond = 0;
 	  fd_set fd_master,fd;
 	  FD_ZERO(&fd_master);
