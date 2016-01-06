@@ -46,7 +46,7 @@ int main(int argc , char*argv[])
       ret = bind(sk,(struct sockaddr *)&my_addr,sizeof(my_addr));
       ret = listen(sk,10);
       int cl_addr_len = sizeof(cl_addr);
-       printf("associazione con il socket effettuata , attendo connessione del client.\r\n");
+       printf("associazione con il socket effettuata , attendo connessione del client \r\n");
       cn_sk = accept(sk,(struct sockaddr * )&cl_addr,&cl_addr_len);
       char r[20];
       int dim;
