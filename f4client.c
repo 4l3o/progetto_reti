@@ -87,7 +87,15 @@ int main (int argc  ,char*argv[] )
 		       break;
 		    
 		     case 3:
-		       
+		       //!who
+		       int number , len;
+		       send_op(3,sk);
+		       recv(sk,&number,sizeof(int),0);
+		       for(int i = 0;i<number;i++)
+			 {
+			   recv(sk,&len,sizeof(int),0);
+			   recv(sk,userName,len*sizeof(int),0);
+			 }
 		       break;
 		     case 4:
 		       break;

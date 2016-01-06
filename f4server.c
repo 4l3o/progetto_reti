@@ -12,7 +12,7 @@
   
 int main (int argc , char*argv[])
 {
-  user * listautenti;
+  user * listautenti=NULL;
   struct sockaddr_in myaddr , cl_addr;
   int sk, cn_sk , ret ,fdmax;
   if(argc < 3)
@@ -77,6 +77,10 @@ int main (int argc , char*argv[])
 			   printf("%s e' disponibile\r\n",listautenti->nome);
 			   break;
 			 }
+		       case 3:
+			 int usrnumber = count_list(listautenti);
+			 send(i,&number,sizeof(int),0);
+			 break;
 		       default:
 			 break;
 		       }

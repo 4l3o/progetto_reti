@@ -51,3 +51,13 @@ int serverInit(struct sockaddr_in * myaddr , int*listeningSk , char*ip, char*por
   printf("Inizializzazione del server effettuata con successo\r\n Indirizzo: %s (Porta: %i)\r\n Attendo connessione client\r\n",ip,atoi(port));
   return 0;
 }
+
+int count_list(user*testa)
+{
+  int risultato = 0;
+  for(user*i;i!=NULL;i=i->next)
+    {
+      risultato ++ ;
+    }
+  return risultato;
+}
