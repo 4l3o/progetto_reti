@@ -56,21 +56,30 @@ int main (int argc , char*argv[])
 		}
 	      else
 	       {
-		 unsigned short op;
+		 unsigned short op = 0 ;
 		 recv(i,&op,sizeof(unsigned short int),0);
-		 switch (op)
+		 //printf("op:%hu\r\n",op);
+		 if(op!=0)
 		   {
-		   case 0:
-		     //registrazione nuovo utente
-		     char usrname[20];
-		     int udpport;
-		     int len;
-		     rcv(i,&udpport,sizeof(int),0);
-		     rcv(i,&len,sizeof(int),0);
-		     rcv(i,username,len*(sizeof(char)));
-		     lista_utenti=nuovo_utente(lista_utenti,usrname,i,udpport,0);
-		     printf("%s si e' connesso\r\n %s è libero ",lista_utenti->nome);
-		     break;
+		     switch (op)
+		       {
+		       case 1:
+			 {
+			   //registrazione nuovo utente
+			   char usrname[20];
+			   int udpport;
+			   int len;
+			   recv(i,&udpport,sizeof(int),0);
+			   recv(i,&len,sizeof(int),0);
+			   recv(i,usrname,len*(sizeof(char)),0);
+			   listautenti=nuovo_utente(listautenti,usrname,i,udpport,0);
+			   printf("%s si e' connesso\r\n",listautenti->nome);
+			   printf("%s e' disponibile\r\n",listautenti->nome);
+			   break;
+			 }
+		       default:
+			 break;
+		       }
 		   }
 
 	       }

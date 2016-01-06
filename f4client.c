@@ -44,8 +44,12 @@ int main (int argc  ,char*argv[] )
 	  sscanf(cmnd_string,"%4i",&udpPort);
 	  //srvrSend(1 ,usrName ,len ,sk);
 	  send_op(1,sk);
-	  printf("%i\r\n",len);
+	  // printf("%i\r\n",len);
+	  //invio la porta
+	  send_len(udpPort,sk);
+	  //invio la lunghezza
 	  send_len(len,sk);
+	  //invio il messaggio
 	  send_msg(len,sk,usrName);
 	  int loopCond = 0;
 	  fd_set fd_master,fd;
