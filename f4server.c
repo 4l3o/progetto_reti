@@ -42,10 +42,36 @@ int main (int argc , char*argv[])
 	    {
 	      if(i==sk)
 		{
-		  int newsk = accept();
+		  int addrlen = sizeof(cl_addr);
+		  int newsk = accept(sk,(struct sockaddr *)&cl_addr,&addrlen);
+		  if(newsk == -1 )
+		    {
+		      perror("server accept error");
+		    }
+		  else
+		    {
+		      FD_SET(newsk , &master);
+		      fdmax = (newsk > fdmax)?newsk:fdmax;
+		    }
 		}
 	      else
 	       {
+		 unsigned short op;
+		 recv(i,&op,sizeof(unsigned short int),0);
+		 switch (op)
+		   {
+		   case 0:
+		     //registrazione nuovo utente
+		     char usrname[20];
+		     int udpport;
+		     int len;
+		     rcv(i,&udpport,sizeof(int),0);
+		     rcv(i,&len,sizeof(int),0);
+		     rcv(i,username,len*(sizeof(char)));
+		     lista_utenti=nuovo_utente(lista_utenti,usrname,i,udpport,0);
+		     printf("%s si e' connesso\r\n %s è libero ",lista_utenti->nome);
+		     break;
+		   }
 
 	       }
 	    }
