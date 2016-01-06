@@ -1,6 +1,26 @@
 /**
  *Author:Bachechi Andrea
  **/
+typedef struct utente
+{
+  struct utente* next;
+  int udpport;
+  int sk;
+  int stato;
+}user;
+
+user*  nuovo_utente(user*testa , char*nome , int udpport ,int stato)
+{
+  user*nuovo;
+  nuovo = (user*)malloc(sizeof(user));
+  nuovo ->udpport = udpport;
+  nuovo ->stato = stato;
+  strcpy(nuovo->nome,nome);
+  nuovo ->next = testa;
+  return nuovo;
+}
+
+
 int serverInit(struct sockaddr_in * myaddr , int*listeningSk , char*ip, char*port)
 {
   int ok = 0;
