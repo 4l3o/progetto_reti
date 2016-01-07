@@ -54,9 +54,11 @@ int serverInit(struct sockaddr_in * myaddr , int*listeningSk , char*ip, char*por
 
 int count_list(user*testa)
 {
+  printf("conto il numero di utenti \r\n");
   int risultato = 0;
-  for(user*i;i!=NULL;i=i->next)
+  for(user*i=testa;i!=NULL;i=i->next)
     {
+      printf("%s",i->nome);
       risultato ++ ;
     }
   return risultato;

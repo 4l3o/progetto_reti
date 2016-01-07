@@ -61,6 +61,7 @@ int main (int argc , char*argv[])
 		 //printf("op:%hu\r\n",op);
 		 if(op!=0)
 		   {
+		     printf("%hu\r\n",op);
 		     switch (op)
 		       {
 		       case 1:
@@ -78,10 +79,24 @@ int main (int argc , char*argv[])
 			   break;
 			 }
 		       case 3:
+			 {
+			   //printf("invio lista utenti ");
 			 int usrnumber = count_list(listautenti);
-			 send(i,&number,sizeof(int),0);
+			 printf("%i",usrnumber);
+			 send(i,&usrnumber,sizeof(int),0);
+			 for(user*k=listautenti;k!=NULL;k=k->next)
+			   {
+			     if(k->stato == 0)
+			       {
+				 int size = sizeof(k->nome)/sizeof(k->nome[0]);
+				 send(i,&size,sizeof(int),0);
+				 send(i,&k->nome,size*sizeof(char),0);
+			       }
+			   }
 			 break;
+			 }
 		       default:
+			 printf("default\r\n");
 			 break;
 		       }
 		   }
