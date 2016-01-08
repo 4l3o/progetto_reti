@@ -108,6 +108,26 @@ int main (int argc , char*argv[])
 			   }
 			 break;
 			 }
+		       case 4:
+			 {
+			   recv(i,&len,sizeof(int),0);
+			   recv(i,username,len*(sizeof(char)),0);
+			   user*target=cerca_utente(username,listautenti);
+			   if(target == NULL)
+			     {
+			       len = -1;
+			       send(i,&len,sizeof(int),0);
+			     }
+			   else
+			     {
+			       user*sender =cerca_utente_sk(i,listautenti);
+			       len = sizeof(sender->nome)/sizeof(sender->nome[0]);
+			       send(target->sk,&len,sizeof(int),0);
+			       send(target->sk,&target->nome,len*sizeof(char),0);
+			       //ricevo la risposta del client
+			     }
+			 break;
+			 }
 		       default:
 			 printf("default\r\n");
 			 break;

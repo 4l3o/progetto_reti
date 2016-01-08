@@ -63,7 +63,15 @@ user* cerca_utente(char*username , user*testa)
     }
   return NULL;
 }
-
+user* cerca_utente_sk(int sk , user*testa)
+{
+  for(user*i;i!=NULL;i=i->next)
+    {
+      if(sk == i->sk)
+	return i;
+    }
+  return NULL;
+}
 int count_list(user*testa)
 {
   //printf("conto il numero di utenti \r\n");

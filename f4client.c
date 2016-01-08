@@ -65,6 +65,7 @@ int main (int argc  ,char*argv[] )
 		 printf("> ");
 	       else
 		 printf("# ");
+	       fflush(stdout);
 	       fd = fd_master;
 	       if(select(sk+1,&fd,NULL,NULL,NULL) == -1)
 		 {
@@ -79,6 +80,7 @@ int main (int argc  ,char*argv[] )
 		 {
 		   fgets(cmnd_string , 25 , stdin);
 		   int action ;
+		   char argument[10];
 		   action = parse_cmd_strng(cmnd_string);
 		   switch (action)
 		     {
@@ -120,6 +122,12 @@ int main (int argc  ,char*argv[] )
 		       break;
 		       }
 		     case 4:
+		       //!connect
+		       sscanf(cmnd_string,"*%s%s%n",argument,len);
+		       send_op(4,sk);
+		       send_len(len,sk);
+		       send_msg(len,sk,argument);
+		       
 		       break;
 		       
 		     case 5:
