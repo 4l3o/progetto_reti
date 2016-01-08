@@ -35,11 +35,12 @@ int main (int argc  ,char*argv[] )
 	  char usrName[20];
 	  int udpPort;
 	  int len;
+	  int partita_avviata = 0;
 	  char cmnd_string[25];
-	  printf("Inserisci il tuo nome (max 20 caratteri):");
+	  printf("Inserisci il tuo nome (max 20 caratteri):\r\n> ");
 	  fgets(cmnd_string,20,stdin);
 	  sscanf(cmnd_string,"%19s%n",usrName,&len);
-	  printf("Inserisci la porta UDP di ascolto:");
+	  printf("Inserisci la porta UDP di ascolto:\r\n> ");
 	  fgets(cmnd_string,24,stdin);
 	  sscanf(cmnd_string,"%4i",&udpPort);
 	  //srvrSend(1 ,usrName ,len ,sk);
@@ -60,6 +61,10 @@ int main (int argc  ,char*argv[] )
 	  helper();
 	  while(loopCond == 0)
 	     {
+	       if(partita_avviata == 0)
+		 printf("> ");
+	       else
+		 printf("# ");
 	       fd = fd_master;
 	       if(select(sk+1,&fd,NULL,NULL,NULL) == -1)
 		 {
@@ -83,7 +88,7 @@ int main (int argc  ,char*argv[] )
 		       break;
 		       
 		     case 2:
-		       
+		       helper();
 		       break;
 		    
 		     case 3:
@@ -92,13 +97,26 @@ int main (int argc  ,char*argv[] )
 		       int number , len;
 		       send_op(3,sk);
 		       recv(sk,&number,sizeof(int),0);
-		       printf("sono disponibili %i  utenti:\r\n",number);
-		       for(int i = 0;i< number ;i++)
+		       if(number >0)
 			 {
-			   recv(sk,&len,sizeof(int),0);
-			   recv(sk,usrName,len*sizeof(char),0);
-			   printf("%s",usrName);
+			   printf("sono disponibili %i  utenti:\r\n",number);
+			   for(int i = 0;i<= number ;i++)
+			     {
+			       recv(sk,&len,sizeof(int),0);
+			       //printf("len : %i",len);
+			       recv(sk,usrName,len*sizeof(char),0);
+			       printf("%s\r\n",usrName);
+			     }
 			 }
+		       else
+			 {
+			   printf("non ci sono altri utenti connessi\r\n");
+			 }
+		       /** questo fa parte della connect!!!!
+		       printf("Inserire il nome dell'utente che intendiamo sfidare\r\n");
+		       scanf("%19s%n",userName,len);
+		       send_len(len,sk);
+		       send_msg(len,sk,userName);**/
 		       break;
 		       }
 		     case 4:

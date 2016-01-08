@@ -28,6 +28,9 @@ int main (int argc , char*argv[])
   FD_SET(sk,&master);
   fdmax = sk;
   int return_cond = 0;
+  char username[20];
+  int udpport;
+  int len;
   while(return_cond == 0)
     {
       slave = master;
@@ -67,13 +70,10 @@ int main (int argc , char*argv[])
 		       case 1:
 			 {
 			   //registrazione nuovo utente
-			   char usrname[20];
-			   int udpport;
-			   int len;
 			   recv(i,&udpport,sizeof(int),0);
 			   recv(i,&len,sizeof(int),0);
-			   recv(i,usrname,len*(sizeof(char)),0);
-			   listautenti=nuovo_utente(listautenti,usrname,i,udpport,0);
+			   recv(i,username,len*(sizeof(char)),0);
+			   listautenti=nuovo_utente(listautenti,username,i,udpport,0);
 			   printf("%s si e' connesso\r\n",listautenti->nome);
 			   printf("%s e' disponibile\r\n",listautenti->nome);
 			   break;
@@ -81,16 +81,29 @@ int main (int argc , char*argv[])
 		       case 3:
 			 {
 			   //printf("invio lista utenti ");
-			 int usrnumber = count_list(listautenti);
-			 printf("%i",usrnumber);
+			 int usrnumber = count_list(listautenti)-1;
+			 //printf("%i",usrnumber);
 			 send(i,&usrnumber,sizeof(int),0);
-			 for(user*k=listautenti;k!=NULL;k=k->next)
+			 if(usrnumber >0)
 			   {
-			     if(k->stato == 0)
+			     for(user*k=listautenti;k!=NULL;k=k->next)
 			       {
-				 int size = sizeof(k->nome)/sizeof(k->nome[0]);
-				 send(i,&size,sizeof(int),0);
-				 send(i,&k->nome,size*sizeof(char),0);
+				 printf("%s : %i\r\n",k->nome , k->stato);
+				 if(k->stato == 0 && k->sk != i)
+				   {
+				     //printf("%s\r\n",k->nome);
+				     len = sizeof(k->nome)/sizeof(k->nome[0]);
+				     send(i,&len,sizeof(int),0);
+				     send(i,&k->nome,len*sizeof(char),0);
+				   }
+				 /**  questo fa parte della connect!!!!!
+				      recv(sk,&size,sizeof(int),0);
+				      recv(sk,username,size*sizeof(char),0);
+				      user*target=cerca_utente(username , listautenti);
+				      if(target == NULL)
+				      {
+
+				      }**/
 			       }
 			   }
 			 break;

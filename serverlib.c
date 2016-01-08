@@ -52,13 +52,25 @@ int serverInit(struct sockaddr_in * myaddr , int*listeningSk , char*ip, char*por
   return 0;
 }
 
+user* cerca_utente(char*username , user*testa)
+{
+  for(user*i;i!=NULL;i=i->next)
+    {
+      if(strcmp(i->nome,username))
+	{
+	  return i;
+	}
+    }
+  return NULL;
+}
+
 int count_list(user*testa)
 {
-  printf("conto il numero di utenti \r\n");
+  //printf("conto il numero di utenti \r\n");
   int risultato = 0;
   for(user*i=testa;i!=NULL;i=i->next)
     {
-      printf("%s",i->nome);
+      // printf("%s",i->nome);
       risultato ++ ;
     }
   return risultato;
