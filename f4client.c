@@ -44,7 +44,7 @@ int main (int argc  ,char*argv[] )
 	  fgets(cmnd_string,24,stdin);
 	  sscanf(cmnd_string,"%4i",&udpPort);
 	  //srvrSend(1 ,usrName ,len ,sk);
-	  send_op(1,sk);
+	  //send_op(1,sk);
 	  // printf("%i\r\n",len);
 	  //invio la porta
 	  send_len(udpPort,sk);
@@ -74,7 +74,34 @@ int main (int argc  ,char*argv[] )
 		 }
 	       if(FD_ISSET(sk,&fd))
 		 {
+		   int len;
+		   char nome[20];
 		   //chiedere all'utente se vuole accettare la partita
+		   recv(sk,,&len,sizeof(int),0);
+		   recv(sk,nome,len*sizeof(char),0);
+		   printf("\r\n%s ti ha invitato a giocare , vuoi accettare la partita?(y/n)\r\n>");
+		   fflush(stdout);
+		   int risposta_corretta = 0;
+		   char risposta; 
+		   while(risposta_corretta == 0)
+		     {
+		       scanf("%c",risposta);
+		       if(risposta == 'y' || risposta == 'Y' || risposta == 'n' || risposta == 'N')
+			 risposta_corretta = 1;
+		       else
+			 {
+			   printf("risposta non valida , inserire y se si vuole accettare o n altrimenti \r\n>");
+			   fflush("stdout");
+			 }
+		     }
+		   int codifica = codifica_risposta();
+		   send(sk,codifica,sizeof(int),0);
+		   if(codifica == 1)
+		     {
+		       int ip ;
+		       recv(sk,&ip,sizeof(int),0);
+		       
+		     }
 		 }
 	       if(FD_ISSET(0,&fd))
 		 {
@@ -122,14 +149,27 @@ int main (int argc  ,char*argv[] )
 		       break;
 		       }
 		     case 4:
+		       {
 		       //!connect
 		       sscanf(cmnd_string,"*%s%s%n",argument,len);
 		       send_op(4,sk);
 		       send_len(len,sk);
 		       send_msg(len,sk,argument);
-		       
+		       int risposta ;
+		       recv(sk,&risposta,sizeof(int),0);
+		       if(risposta == -1)
+			 printf("%s nome inesistente\r\n",argument);
+		       else if(risposta == -2)
+			 printf("%s gia' impegnato in una partita\r\n");
+		       else if(risposta == 0)
+			 printf("l'utente %s ha rifiutato la partita\r\n",argument);
+		       else
+			 {
+			   printf("l'utente %s ha accettato la partita\r\n");
+			   
+			 }
 		       break;
-		       
+		       }
 		     case 5:
 		       break;
 		       

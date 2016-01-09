@@ -55,6 +55,12 @@ int main (int argc , char*argv[])
 		    {
 		      FD_SET(newsk , &master);
 		      fdmax = (newsk > fdmax)?newsk:fdmax;
+		      recv(i,&udpport,sizeof(int),0);
+		      recv(i,&len,sizeof(int),0);
+		      recv(i,username,len*(sizeof(char)),0);
+		      listautenti=nuovo_utente(listautenti,username,i,udpport,&cl_addr,0);
+		      printf("%s si e' connesso\r\n",listautenti->nome);
+		      printf("%s e' disponibile\r\n",listautenti->nome);
 		    }
 		}
 	      else
@@ -67,7 +73,7 @@ int main (int argc , char*argv[])
 		     printf("%hu\r\n",op);
 		     switch (op)
 		       {
-		       case 1:
+			 /** case 1:
 			 {
 			   //registrazione nuovo utente
 			   recv(i,&udpport,sizeof(int),0);
@@ -77,7 +83,7 @@ int main (int argc , char*argv[])
 			   printf("%s si e' connesso\r\n",listautenti->nome);
 			   printf("%s e' disponibile\r\n",listautenti->nome);
 			   break;
-			 }
+			   }**/
 		       case 3:
 			 {
 			   //printf("invio lista utenti ");
@@ -120,11 +126,31 @@ int main (int argc , char*argv[])
 			     }
 			   else
 			     {
-			       user*sender =cerca_utente_sk(i,listautenti);
-			       len = sizeof(sender->nome)/sizeof(sender->nome[0]);
-			       send(target->sk,&len,sizeof(int),0);
-			       send(target->sk,&target->nome,len*sizeof(char),0);
-			       //ricevo la risposta del client
+			       if(target->stato == 1)
+				 {
+				   len = -2;
+				   send(i,&len,sizeof(int),0);
+				 }
+			       else
+				 {
+				   user*sender =cerca_utente_sk(i,listautenti);
+				   len = sizeof(sender->nome)/sizeof(sender->nome[0]);
+				   send(target->sk,&len,sizeof(int),0);
+				   send(target->sk,&target->nome,len*sizeof(char),0);
+				   //ricevo la risposta del client
+				   int risposta;
+				   recv(target->sk,&risposta,sizeof(int),0);
+				   send(i,risposta,sizeof(int),0);
+				   if(risposta == 1)
+				     {
+				       send(i,target->udpport,sizeof(int),0);
+				       send(target->sk,sender->udpport,sizeof(int),0);
+				       int ipaddr = target->indirizzo.sin_addr.s_addr;
+				       send(i,ipaddr,sizeof(int),0);
+				       ipaddr = sender->indirizzo.sin_addr.s_addr;
+				       send(target->sk,ipaddr,sizeof(int),0);
+				     }
+				 }
 			     }
 			 break;
 			 }

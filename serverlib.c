@@ -5,12 +5,14 @@ typedef struct utente
 {
   struct utente* next;
   int udpport;
+  struct sockaddr_in indirizzo;
   int sk;
   int stato;
   char nome[20];
+  
 }user;
 
-user*  nuovo_utente(user*testa , char*nome ,int sv_sk , int udpport ,int stato)
+user*  nuovo_utente(user*testa , char*nome ,int sv_sk , int udpport ,struct sockaddr_in *myaddr,int stato)
 {
   user*nuovo;
   nuovo = (user*)malloc(sizeof(user));
@@ -18,6 +20,7 @@ user*  nuovo_utente(user*testa , char*nome ,int sv_sk , int udpport ,int stato)
   nuovo ->sk = sv_sk;
   nuovo ->stato = stato;
   strcpy(nuovo->nome,nome);
+  nuovo ->indirizzo = *myaddr;
   nuovo ->next = testa;
   return nuovo;
 }
@@ -63,6 +66,7 @@ user* cerca_utente(char*username , user*testa)
     }
   return NULL;
 }
+
 user* cerca_utente_sk(int sk , user*testa)
 {
   for(user*i;i!=NULL;i=i->next)
@@ -72,6 +76,7 @@ user* cerca_utente_sk(int sk , user*testa)
     }
   return NULL;
 }
+
 int count_list(user*testa)
 {
   //printf("conto il numero di utenti \r\n");
@@ -82,4 +87,14 @@ int count_list(user*testa)
       risultato ++ ;
     }
   return risultato;
+}
+
+int codifica_risposta(char risposta)
+{
+  if(risposta == 'y'|| risposta == 'Y')
+    return 1;
+  else if(risposta == 'n' || risposta == 'N')
+    return 0;
+  else
+    return -1;
 }
