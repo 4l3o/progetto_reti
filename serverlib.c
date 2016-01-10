@@ -57,19 +57,20 @@ int serverInit(struct sockaddr_in * myaddr , int*listeningSk , char*ip, char*por
 
 user* cerca_utente(char*username , user*testa)
 {
-  for(user*i;i!=NULL;i=i->next)
+  for(user*i=testa;i!=NULL;i=i->next)
     {
-      if(strcmp(i->nome,username))
+      if(strcmp(i->nome,username)==0)
 	{
 	  return i;
 	}
     }
+  printf("utente non trovato\r\n");
   return NULL;
 }
 
 user* cerca_utente_sk(int sk , user*testa)
 {
-  for(user*i;i!=NULL;i=i->next)
+  for(user*i=testa;i!=NULL;i=i->next)
     {
       if(sk == i->sk)
 	return i;
@@ -89,12 +90,3 @@ int count_list(user*testa)
   return risultato;
 }
 
-int codifica_risposta(char risposta)
-{
-  if(risposta == 'y'|| risposta == 'Y')
-    return 1;
-  else if(risposta == 'n' || risposta == 'N')
-    return 0;
-  else
-    return -1;
-}

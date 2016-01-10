@@ -55,10 +55,10 @@ int main (int argc , char*argv[])
 		    {
 		      FD_SET(newsk , &master);
 		      fdmax = (newsk > fdmax)?newsk:fdmax;
-		      recv(i,&udpport,sizeof(int),0);
-		      recv(i,&len,sizeof(int),0);
-		      recv(i,username,len*(sizeof(char)),0);
-		      listautenti=nuovo_utente(listautenti,username,i,udpport,&cl_addr,0);
+		      recv(newsk,&udpport,sizeof(int),0);
+		      recv(newsk,&len,sizeof(int),0);
+		      recv(newsk,username,len*(sizeof(char)),0);
+		      listautenti=nuovo_utente(listautenti,username,newsk,udpport,&cl_addr,0);
 		      printf("%s si e' connesso\r\n",listautenti->nome);
 		      printf("%s e' disponibile\r\n",listautenti->nome);
 		    }
@@ -73,7 +73,7 @@ int main (int argc , char*argv[])
 		     printf("%hu\r\n",op);
 		     switch (op)
 		       {
-			 /** case 1:
+			 /**  case 1:
 			 {
 			   //registrazione nuovo utente
 			   recv(i,&udpport,sizeof(int),0);
@@ -86,40 +86,31 @@ int main (int argc , char*argv[])
 			   }**/
 		       case 3:
 			 {
-			   //printf("invio lista utenti ");
-			 int usrnumber = count_list(listautenti)-1;
-			 //printf("%i",usrnumber);
+			 int usrnumber = count_list(listautenti);
+			 printf("%i",usrnumber);
 			 send(i,&usrnumber,sizeof(int),0);
 			 if(usrnumber >0)
 			   {
 			     for(user*k=listautenti;k!=NULL;k=k->next)
 			       {
 				 printf("%s : %i\r\n",k->nome , k->stato);
-				 if(k->stato == 0 && k->sk != i)
-				   {
-				     //printf("%s\r\n",k->nome);
-				     len = sizeof(k->nome)/sizeof(k->nome[0]);
-				     send(i,&len,sizeof(int),0);
-				     send(i,&k->nome,len*sizeof(char),0);
-				   }
-				 /**  questo fa parte della connect!!!!!
-				      recv(sk,&size,sizeof(int),0);
-				      recv(sk,username,size*sizeof(char),0);
-				      user*target=cerca_utente(username , listautenti);
-				      if(target == NULL)
-				      {
-
-				      }**/
+				 //printf("%s\r\n",k->nome);
+				 int len = sizeof(k->nome)/sizeof(k->nome[0]);
+				 send(i,&len,sizeof(int),0);
+				 send(i,&k->nome,len*sizeof(char),0);  
 			       }
 			   }
 			 break;
 			 }
-		       case 4:
+			  case 4:
 			 {
+			   int len;
 			   recv(i,&len,sizeof(int),0);
+			   printf("caratteri da leggere:%i\r\n",len);
 			   recv(i,username,len*(sizeof(char)),0);
+			   printf("utente richiesto %s\r\n",username);
 			   user*target=cerca_utente(username,listautenti);
-			   if(target == NULL)
+			   if(!target)
 			     {
 			       len = -1;
 			       send(i,&len,sizeof(int),0);
@@ -136,22 +127,25 @@ int main (int argc , char*argv[])
 				   user*sender =cerca_utente_sk(i,listautenti);
 				   len = sizeof(sender->nome)/sizeof(sender->nome[0]);
 				   send(target->sk,&len,sizeof(int),0);
-				   send(target->sk,&target->nome,len*sizeof(char),0);
+				   send(target->sk,&sender->nome,len*sizeof(char),0);
 				   //ricevo la risposta del client
 				   int risposta;
 				   recv(target->sk,&risposta,sizeof(int),0);
-				   send(i,risposta,sizeof(int),0);
+				   send(i,&risposta,sizeof(int),0);
 				   if(risposta == 1)
 				     {
-				       send(i,target->udpport,sizeof(int),0);
-				       send(target->sk,sender->udpport,sizeof(int),0);
+				       send(i,&target->udpport,sizeof(int),0);
+				       send(target->sk,&sender->udpport,sizeof(int),0);
 				       int ipaddr = target->indirizzo.sin_addr.s_addr;
-				       send(i,ipaddr,sizeof(int),0);
+				       char ip[INET_ADDRSTRLEN];
+				       inet_ntop(AF_INET,&ipaddr,ip,INET_ADDRSTRLEN);
+				       send(i,ip,INET_ADDRSTRLEN * sizeof(char),0);
 				       ipaddr = sender->indirizzo.sin_addr.s_addr;
-				       send(target->sk,ipaddr,sizeof(int),0);
+				       inet_ntop(AF_INET,&ipaddr,ip,INET_ADDRSTRLEN);
+				       send(target->sk,ip,INET_ADDRSTRLEN * sizeof(char),0);
 				     }
 				 }
-			     }
+			       } 
 			 break;
 			 }
 		       default:

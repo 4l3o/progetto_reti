@@ -12,8 +12,8 @@
 
 int main (int argc  ,char*argv[] )
 {
-  struct sockaddr_in srvr_addr;
-  int ret, sk;
+  struct sockaddr_in srvr_addr,udp_addr ,client_addr;
+  int ret, sk ,udpsk , c_udpport;
   if(argc < 3)
     {
       printf("argomenti mancanti!!");
@@ -40,6 +40,7 @@ int main (int argc  ,char*argv[] )
 	  printf("Inserisci il tuo nome (max 20 caratteri):\r\n> ");
 	  fgets(cmnd_string,20,stdin);
 	  sscanf(cmnd_string,"%19s%n",usrName,&len);
+	  printf("%i\r\n",len);
 	  printf("Inserisci la porta UDP di ascolto:\r\n> ");
 	  fgets(cmnd_string,24,stdin);
 	  sscanf(cmnd_string,"%4i",&udpPort);
@@ -49,15 +50,17 @@ int main (int argc  ,char*argv[] )
 	  //invio la porta
 	  send_len(udpPort,sk);
 	  //invio la lunghezza
-	  send_len(len,sk);
+	  send_len(len+1,sk);
 	  //invio il messaggio
-	  send_msg(len,sk,usrName);
+	  send_msg(len+1,sk,usrName);
 	  int loopCond = 0;
+	  partita * game;
 	  fd_set fd_master,fd;
 	  FD_ZERO(&fd_master);
 	  FD_ZERO(&fd);
 	  FD_SET(0,&fd_master);
 	  FD_SET(sk,&fd_master);
+	  int fdmax = sk;
 	  helper();
 	  while(loopCond == 0)
 	     {
@@ -67,7 +70,7 @@ int main (int argc  ,char*argv[] )
 		 printf("# ");
 	       fflush(stdout);
 	       fd = fd_master;
-	       if(select(sk+1,&fd,NULL,NULL,NULL) == -1)
+	       if(select(fdmax+1,&fd,NULL,NULL,NULL) == -1)
 		 {
 		   perror("select() error");
 		   exit(1);
@@ -77,30 +80,76 @@ int main (int argc  ,char*argv[] )
 		   int len;
 		   char nome[20];
 		   //chiedere all'utente se vuole accettare la partita
-		   recv(sk,,&len,sizeof(int),0);
+		   recv(sk,&len,sizeof(int),0);
 		   recv(sk,nome,len*sizeof(char),0);
-		   printf("\r\n%s ti ha invitato a giocare , vuoi accettare la partita?(y/n)\r\n>");
+		   printf("\r\n%s ti ha invitato a giocare , vuoi accettare la partita?(y/n)\r\n>",nome);
 		   fflush(stdout);
 		   int risposta_corretta = 0;
 		   char risposta; 
 		   while(risposta_corretta == 0)
 		     {
-		       scanf("%c",risposta);
+		       scanf("%c",&risposta);
 		       if(risposta == 'y' || risposta == 'Y' || risposta == 'n' || risposta == 'N')
 			 risposta_corretta = 1;
 		       else
 			 {
 			   printf("risposta non valida , inserire y se si vuole accettare o n altrimenti \r\n>");
-			   fflush("stdout");
+			   fflush(stdout);
 			 }
 		     }
-		   int codifica = codifica_risposta();
-		   send(sk,codifica,sizeof(int),0);
+		   int codifica = codifica_risposta(risposta);
+		   send(sk,&codifica,sizeof(int),0);
 		   if(codifica == 1)
 		     {
-		       int ip ;
-		       recv(sk,&ip,sizeof(int),0);
-		       
+		       recv(sk,&c_udpport,sizeof(int),0);
+		       char ip[INET_ADDRSTRLEN] ;
+		       recv(sk,&ip,INET_ADDRSTRLEN * sizeof(char),0);
+		       //udp_port_init(&udp_addr,&udpsk,udpPort );
+		       udp_port_init(&udp_addr,&udpsk,udpPort);
+		       init_client_addr(&client_addr , c_udpport,ip);
+		       FD_SET(udpsk,&fd_master);
+		       fdmax = (udpsk > fdmax) ?udpsk :fdmax;
+		       game = init_game_structure(0,0);
+		       partita_avviata = 1;
+		     }
+	       }
+	       if(partita_avviata == 1)
+		 {
+		   if(FD_ISSET(udpsk,&fd))
+		     {
+		       struct sockaddr_in rec;
+		       int op = 0;
+		       socklen_t sl = sizeof(rec);
+		       recvfrom(udpsk,&op,sizeof(int),0,(struct sockaddr*)&rec,&sl);
+		       switch(op)
+			 {
+			 case 1:
+			   {
+			   //quit
+			     break;
+			   }
+			 case 5:
+			   {
+			     //disconnect
+			     
+			     break;
+			   }
+			 case 7:
+			   {
+			     //insert
+			     char col;
+			     recvfrom(udpsk,&col,sizeof(char),0,(struct sockaddr*)&rec,&sl);
+			     insert(col ,game);
+			     // printf("inserito gettone in %c",col);
+			     if(winning_conditio(game))
+			       printf("hai vinto la partita");
+			     else
+			       {
+				 game ->turn =1;
+			       }
+			     break;
+			   }
+			 }
 		     }
 		 }
 	       if(FD_ISSET(0,&fd))
@@ -129,7 +178,7 @@ int main (int argc  ,char*argv[] )
 		       if(number >0)
 			 {
 			   printf("sono disponibili %i  utenti:\r\n",number);
-			   for(int i = 0;i<= number ;i++)
+			   for(int i = 0;i< number ;i++)
 			     {
 			       recv(sk,&len,sizeof(int),0);
 			       //printf("len : %i",len);
@@ -141,44 +190,79 @@ int main (int argc  ,char*argv[] )
 			 {
 			   printf("non ci sono altri utenti connessi\r\n");
 			 }
-		       /** questo fa parte della connect!!!!
-		       printf("Inserire il nome dell'utente che intendiamo sfidare\r\n");
-		       scanf("%19s%n",userName,len);
-		       send_len(len,sk);
-		       send_msg(len,sk,userName);**/
 		       break;
 		       }
 		     case 4:
 		       {
-		       //!connect
-		       sscanf(cmnd_string,"*%s%s%n",argument,len);
-		       send_op(4,sk);
-		       send_len(len,sk);
-		       send_msg(len,sk,argument);
-		       int risposta ;
-		       recv(sk,&risposta,sizeof(int),0);
-		       if(risposta == -1)
-			 printf("%s nome inesistente\r\n",argument);
-		       else if(risposta == -2)
-			 printf("%s gia' impegnato in una partita\r\n");
-		       else if(risposta == 0)
-			 printf("l'utente %s ha rifiutato la partita\r\n",argument);
-		       else
-			 {
-			   printf("l'utente %s ha accettato la partita\r\n");
-			   
-			 }
+			 if(partita_avviata == 1)
+			   printf("sei gia connesso ad una partita\r\n");
+			 else
+			   {
+			     //!connect
+			     int diff;
+			     sscanf(cmnd_string,"%*s %n%s%n",&diff,argument,&len);
+			     printf("%s : %i\r\n",argument,len-diff);
+			     send_op(4,sk);
+			     int invio = len-diff;
+			     //send(sk,&invio,sizeof(int),0);
+			     send_len(len-diff+1,sk);
+			     send_msg(len-diff+1,sk,argument);
+			     int risposta ;
+			     recv(sk,&risposta,sizeof(int),0);
+			     if(risposta == -1)
+			       printf("%s nome inesistente\r\n",argument);
+			     else if(risposta == -2)
+			       printf("%s gia' impegnato in una partita\r\n",argument);
+			     else if(risposta == 0)
+			       printf("l'utente %s ha rifiutato la partita\r\n",argument);
+			     else
+			       {
+				 printf("l'utente %s ha accettato la partita\r\n",argument);
+				 recv(sk,&c_udpport,sizeof(int),0);
+				 char ip[INET_ADDRSTRLEN];
+				 recv(sk , &ip , INET_ADDRSTRLEN*sizeof(char),0);
+				 udp_port_init(&udp_addr,&udpsk,udpPort);
+				 init_client_addr(&client_addr , c_udpport,ip);
+				 FD_SET(udpsk,&fd_master);
+				 fdmax = (udpsk > fdmax) ?udpsk :fdmax;
+				 game = init_game_structure(1,1);
+				 partita_avviata = 1;
+				 printf("partita avviata: è il tuo turno\r\n ");
+			       }
+			   }
 		       break;
 		       }
 		     case 5:
 		       break;
 		       
 		     case 6:
+		       {
+
+		       }
 		       break;
+		       
 		       
 		     case 7:
-		       break;
-		       
+		       {
+			 if(game->turn == 0)
+			   printf("non è il tuo turno\r\n");
+			 else
+			   {
+			     char col;
+			     sscanf(cmnd_string ,"%*s %c",&col);
+			     insert(col , game);
+			     int op =7;
+			     sendto(udpsk,&op,sizeof(int),0,(struct sockaddr*)&client_addr,sizeof(client_addr));
+			      sendto(udpsk,&col,sizeof(char),0,(struct sockaddr*)&client_addr,sizeof(client_addr));
+			      if(winning_conditio(game))
+				printf("hai vinto la partita");
+			      else
+				{
+			      game ->turn = 0;
+				}
+			   }
+			 break;
+		       }
 		     case 0:
 		       printf("comando non valido , digitare !help per visualizzare una lista di comandi validi\r\n");
 		       break;

@@ -1,7 +1,14 @@
 /**
  ** Author: Bachechi Andrea
  **/
-void helper()
+typedef struct game_struct
+{
+  int grid[6][7];
+  int symbol;
+  int turn;
+}partita;
+
+  void helper()
 {
   printf("\r\n Sono disponibili i seguenti comandi :\r\n");
   printf(" * !help --> mostra l'elenco dei comandi disponibili\r\n");
@@ -123,3 +130,71 @@ int send_msg(int len , int socket ,char * msg)
     }
 }
 
+void udp_port_init(struct sockaddr_in *udpaddr , int*udpsk , int udpport )
+{
+  if((*udpsk = socket(AF_INET,SOCK_DGRAM, 0)) == -1)
+    {
+      perror("errore sul socket udp");
+      exit(1);
+    }
+  memset(udpaddr , 0, sizeof(*udpaddr));
+  udpaddr -> sin_family = AF_INET;
+  udpaddr -> sin_port = htons(udpport);
+  udpaddr ->sin_addr.s_addr = htonl(INADDR_ANY);
+  //inet_aton(ip , &udpaddr->sin_addr);
+  if(bind(*udpsk,(struct sockaddr*)udpaddr ,sizeof(*udpaddr)) == -1)
+    {
+      perror("bind udp socket");
+      exit(1);
+    }
+  
+}
+
+void init_client_addr(struct sockaddr_in *client_addr , int udpport , char* ip)
+{
+  memset(client_addr ,0,sizeof(*client_addr));
+  client_addr->sin_family = AF_INET;
+  client_addr->sin_port = htons(udpport);
+  inet_aton(ip , &client_addr->sin_addr);
+  printf("client ip: %s , port: %i",ip,udpport);
+}
+
+int codifica_risposta(char risposta)
+{
+  if(risposta == 'y'|| risposta == 'Y')
+    return 1;
+  else if(risposta == 'n' || risposta == 'N')
+    return 0;
+  else
+    return -1;
+}
+
+partita* init_game_structure(int symbol,int turn)
+{
+  partita * nuova = (partita*)malloc(sizeof(partita));
+  nuova ->turn =turn;
+  nuova ->symbol = symbol;
+  for(int i = 0;i<6;i++)
+    {
+      for(int j = 0;i<7;i++)
+	{
+	  nuova->grid[i][j]=-1;
+	}
+    }
+  return nuova;
+}
+
+void destroy_game_structure(partita * pointer)
+{
+  free(pointer);
+}
+
+int winning_condition(partita * pointer)
+{
+  return 0;
+}
+
+int insert(int col , partita*pointer)
+{
+  return 0;
+}
