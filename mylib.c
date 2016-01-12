@@ -156,7 +156,7 @@ void init_client_addr(struct sockaddr_in *client_addr , int udpport , char* ip)
   client_addr->sin_family = AF_INET;
   client_addr->sin_port = htons(udpport);
   inet_aton(ip , &client_addr->sin_addr);
-  printf("client ip: %s , port: %i",ip,udpport);
+  //printf("client ip: %s , port: %i",ip,udpport);
 }
 
 int codifica_risposta(char risposta)
@@ -176,9 +176,11 @@ partita* init_game_structure(int symbol,int turn)
   nuova ->symbol = symbol;
   for(int i = 0;i<6;i++)
     {
-      for(int j = 0;i<7;i++)
+      for(int j = 0;j<7;j++)
 	{
+	  //printf("i:%i j%i ",i,j);
 	  nuova->grid[i][j]=-1;
+	  //printf("grid :%i",nuova->grid[i][j]);
 	}
     }
   return nuova;
@@ -189,12 +191,143 @@ void destroy_game_structure(partita * pointer)
   free(pointer);
 }
 
-int winning_condition(partita * pointer)
+int orizzontal_count(int colonna,int riga , int symbol ,partita * pointer , int increment)
 {
-  return 0;
+  if(colonna == 7 || colonna == -1)
+    {
+      return 0;
+    }
+  else
+    {
+      if(pointer -> grid[riga][colonna] == symbol )
+	return 1 + orizzontal_count(colonna+increment,riga,symbol,pointer,increment);
+      else
+	return 0;
+    }
 }
 
-int insert(int col , partita*pointer)
+int vertical_count(int colonna,int riga , int symbol ,partita * pointer , int increment)
 {
+  if(riga == 6 || riga == -1)
+    {
+      return 0;
+    }
+  else
+    {
+      if(pointer -> grid[riga][colonna] == symbol )
+	return 1 + vertical_count(colonna,riga+increment,symbol,pointer,increment);
+      else
+	return 0;
+    }
+}
+
+int diagonal_count(int colonna,int riga , int symbol ,partita * pointer , int increment)
+{
+  if(colonna == 7 || colonna == -1 || riga == 6 || riga == -1)
+    {
+      return 0;
+    }
+  else
+    {
+      if(pointer -> grid[riga][colonna] == symbol )
+	return 1 + diagonal_count(colonna+increment,riga+increment,symbol,pointer,increment);
+      else
+	return 0;
+    }
+}
+
+
+int winner(char col,partita * pointer)
+{
+  int colonna = (int)col-97;
+  int riga;
+  for(int i = 0 ; i<6;i++)
+    {
+      if(pointer->grid[i][colonna] !=-1)
+	riga = i;
+    }
+  int count_x = 1 + orizzontal_count(colonna+1,riga,pointer->grid[riga][colonna],pointer,1) + orizzontal_count(colonna-1,riga,pointer->grid[riga][colonna],pointer,-1);
+  int count_y = 1 + vertical_count(colonna,riga+1,pointer->grid[riga][colonna],pointer,1) + vertical_count(colonna,riga-1,pointer->grid[riga][colonna],pointer,-1);
+  int count_diag = 1 + diagonal_count(colonna+1,riga+1,pointer->grid[riga][colonna],pointer,1) + diagonal_count(colonna-1,riga-1,pointer->grid[riga][colonna],pointer,-1);
+  if(count_x == 4 || count_y == 4 || count_diag == 4)
+    return 1;
+  else
+    return 0;
+}
+
+int insert(char col ,int symbol, partita*pointer)
+{
+  int inserimento;
+  int colonna;
+  colonna = (int)col -97;
+  //printf("colonna :%i\r\n",colonna);
+  int i =0;
+  while(pointer->grid[i][colonna] != -1)
+    {
+      i +=1;
+    }
+  if(i <=5)
+    {
+      pointer->grid[i][colonna]=symbol;
+    }
   return 0;
 }
+void print_line()
+{
+  for(int i=0;i<8;i++)
+    {
+      if(i==0)
+	printf("  ");
+      else
+	printf("_ _ ");
+    }
+  printf("\r\n");
+}
+void show_map(partita * pointer)
+{
+  printf("\r\n");
+  print_line();
+  for(int i =6 ; i>0;i--)
+    {
+      for(int j = 0;j<8;j++)
+	{
+	  if(j==0 )
+	    {
+	      printf("%i|",i);
+	    }
+	  else
+	    {
+	      int symbol = pointer->grid[i-1][j-1];
+	      if(symbol == 0)
+		{
+		  printf(" o |");
+		}
+	      if(symbol == -1)
+		{
+		  printf("   |");
+		}
+	      if(symbol == 1)
+		{
+		  printf(" x |");
+		}
+	    }
+	}
+      printf("\r\n");
+      print_line();
+    }
+   for(int i = 0;i<7;i++)
+    {
+      int j = i+97;
+      if(i == 0)
+	{
+	  printf("  %c ",(char)j);
+	}
+      else
+	{
+	  printf("%c ",(char)j);
+	}
+    }
+   printf("\r\n");
+ 
+}
+

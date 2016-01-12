@@ -45,7 +45,9 @@ int main (int argc , char*argv[])
 	    {
 	      if(i==sk)
 		{
-		  int addrlen = sizeof(cl_addr);
+		  
+		  //int addrlen = sizeof(cl_addr);
+		  socklen_t addrlen = (socklen_t)sizeof(cl_addr);
 		  int newsk = accept(sk,(struct sockaddr *)&cl_addr,&addrlen);
 		  if(newsk == -1 )
 		    {
@@ -73,17 +75,16 @@ int main (int argc , char*argv[])
 		     printf("%hu\r\n",op);
 		     switch (op)
 		       {
-			 /**  case 1:
+		       case 1:
 			 {
-			   //registrazione nuovo utente
-			   recv(i,&udpport,sizeof(int),0);
-			   recv(i,&len,sizeof(int),0);
-			   recv(i,username,len*(sizeof(char)),0);
-			   listautenti=nuovo_utente(listautenti,username,i,udpport,0);
-			   printf("%s si e' connesso\r\n",listautenti->nome);
-			   printf("%s e' disponibile\r\n",listautenti->nome);
+			   user*temp = cerca_utente_sk(i,listautenti);
+			   printf("%s si è disconnesso\r\n",temp->nome);
+			   rimuovi_utente(i , listautenti);
+			   FD_CLR(i,&master);
+			   close(i);
 			   break;
-			   }**/
+			 }
+		     
 		       case 3:
 			 {
 			 int usrnumber = count_list(listautenti);
@@ -148,6 +149,13 @@ int main (int argc , char*argv[])
 			       } 
 			 break;
 			 }
+		       case 5:
+			 {
+			   user * temp = cerca_utente_sk(i,listautenti);
+			   temp ->stato =0;
+			   break;
+			 }
+		      
 		       default:
 			 printf("default\r\n");
 			 break;

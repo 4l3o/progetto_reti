@@ -123,29 +123,41 @@ int main (int argc  ,char*argv[] )
 		       recvfrom(udpsk,&op,sizeof(int),0,(struct sockaddr*)&rec,&sl);
 		       switch(op)
 			 {
-			 case 1:
-			   {
-			   //quit
-			     break;
-			   }
 			 case 5:
 			   {
-			     //disconnect
-			     
+			   //disconnect
+			     printf("hai vinto!\r\n");
+			     FD_CLR(udpsk,&fd_master);
+			     fdmax = sk;
+			     close(udpsk);
+			     free(game);
+			     partita_avviata = 0;
+			     send_op(5,sk);
 			     break;
 			   }
+	    
 			 case 7:
 			   {
 			     //insert
 			     char col;
 			     recvfrom(udpsk,&col,sizeof(char),0,(struct sockaddr*)&rec,&sl);
-			     insert(col ,game);
-			     // printf("inserito gettone in %c",col);
-			     if(winning_conditio(game))
-			       printf("hai vinto la partita");
+			     int pl2symb = (game->symbol == 0)?1:0;
+			     insert(col ,pl2symb,game);
+			     printf("inserito gettone in %c",col);
+			     if(winner(col,game))
+			       {
+				 printf("hai perso\r\n");
+				 send_op(5,sk);
+				 close(udpsk);
+				 FD_CLR(udpsk,&fd_master);
+				 fdmax = sk;
+				 free(game);
+				 partita_avviata = 0; 
+			       }
 			     else
 			       {
 				 game ->turn =1;
+				 printf("è il tuo turno\r\n ");
 			       }
 			     break;
 			   }
@@ -161,10 +173,20 @@ int main (int argc  ,char*argv[] )
 		   switch (action)
 		     {
 		     case 1:
-		       printf("disconnessione in corso \n\r");
-		       loopCond = 1;
-		       break;
-		       
+		       {
+			 if(partita_avviata == 1)
+			   {
+			     printf("devi prima disconnetterti dalla partita , usa il comando !disconnect");
+			   }
+			 else
+			   {
+			     send_op(1,sk);
+			     close(sk);
+			     loopCond = 1;
+			     printf("client disconnesso correttamente\r\n");
+			   }
+			 break;
+		       }
 		     case 2:
 		       helper();
 		       break;
@@ -226,6 +248,7 @@ int main (int argc  ,char*argv[] )
 				 FD_SET(udpsk,&fd_master);
 				 fdmax = (udpsk > fdmax) ?udpsk :fdmax;
 				 game = init_game_structure(1,1);
+				 show_map(game);
 				 partita_avviata = 1;
 				 printf("partita avviata: è il tuo turno\r\n ");
 			       }
@@ -233,33 +256,65 @@ int main (int argc  ,char*argv[] )
 		       break;
 		       }
 		     case 5:
-		       break;
-		       
-		     case 6:
 		       {
-
-		       }
-		       break;
-		       
-		       
-		     case 7:
-		       {
-			 if(game->turn == 0)
-			   printf("non è il tuo turno\r\n");
+			 if(partita_avviata == 1)
+			   {
+			     int op = 1;
+			     sendto(udpsk,&op,sizeof(int),0,(struct sockaddr*)&client_addr,sizeof(client_addr));
+			     printf("ti sei arreso\r\n");
+			     free(game);
+			      FD_CLR(udpsk,&fd_master);
+			     fdmax = sk;
+			     close(udpsk);
+			     send_op(5,sk);
+			     partita_avviata = 0;
+			   }
 			 else
 			   {
-			     char col;
-			     sscanf(cmnd_string ,"%*s %c",&col);
-			     insert(col , game);
-			     int op =7;
-			     sendto(udpsk,&op,sizeof(int),0,(struct sockaddr*)&client_addr,sizeof(client_addr));
-			      sendto(udpsk,&col,sizeof(char),0,(struct sockaddr*)&client_addr,sizeof(client_addr));
-			      if(winning_conditio(game))
-				printf("hai vinto la partita");
-			      else
-				{
-			      game ->turn = 0;
-				}
+			     printf("per eseguire questo comando devi essere all'interno di una partita\r\n");
+			   }
+			 break;
+		       }
+		     case 6:
+		       {
+			 //show_map
+			 show_map(game);
+		       
+		       break;
+		       }
+		     case 7:
+		       {
+			 if(partita_avviata == 0)
+			   {
+			     printf("devi prima avviare una èartita per poter eseguire questo comando");
+			   }
+			 else
+			   {
+			     if(game->turn == 0)
+			       printf("non è il tuo turno\r\n");
+			     else
+			       {
+				 char col;
+				 sscanf(cmnd_string ,"%*s %c",&col);
+				 insert(col ,game->symbol, game);
+				 int op =7;
+				 sendto(udpsk,&op,sizeof(int),0,(struct sockaddr*)&client_addr,sizeof(client_addr));
+				 sendto(udpsk,&col,sizeof(char),0,(struct sockaddr*)&client_addr,sizeof(client_addr));
+				 if(winner(col , game))
+				   {
+				   printf("hai vinto la partita!\r\n");
+				   send_op(5,sk);
+				   FD_CLR(udpsk,&fd_master);
+				   close(udpsk);
+				   fdmax=sk;
+				   free(game);
+				   partita_avviata = 0;
+				   }
+				 else
+				   {
+				     game ->turn = 0;
+				   }
+			       }
 			   }
 			 break;
 		       }
@@ -267,13 +322,8 @@ int main (int argc  ,char*argv[] )
 		       printf("comando non valido , digitare !help per visualizzare una lista di comandi validi\r\n");
 		       break;
 		       
-		     default :
-		       printf("comando non valido , digitare !help per visualizzare una lista di comandi validi\r\n");
-		       break;
 		     }
-	       // printf("l'utente ha digitato :%s il comando tradotto è: %i \r\n",cmnd_string,action);
-
-		 }
+	       	 }
 	     }
 	}
       else

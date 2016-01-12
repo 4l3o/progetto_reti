@@ -55,6 +55,34 @@ int serverInit(struct sockaddr_in * myaddr , int*listeningSk , char*ip, char*por
   return 0;
 }
 
+void rimuovi_utente(int sk ,user * testa)
+{
+  user* prec , *target;
+   for(user*i=testa;i!=NULL;i=i->next)
+    {
+      
+      if(sk == i->sk)
+	{
+	  target = i;
+	  break;
+	}
+	  prec = i;
+    }
+   if(target == testa)
+     {
+       user * temp;
+       temp = target->next;
+       free(target);
+       testa = temp;
+     }
+   else
+     {
+       prec->next = target ->next;
+       free(target);
+     }
+  
+}
+
 user* cerca_utente(char*username , user*testa)
 {
   for(user*i=testa;i!=NULL;i=i->next)
