@@ -61,19 +61,38 @@ int main (int argc  ,char*argv[] )
 	  FD_SET(0,&fd_master);
 	  FD_SET(sk,&fd_master);
 	  int fdmax = sk;
+	  struct timeval timeout;
 	  helper();
 	  while(loopCond == 0)
 	     {
 	       if(partita_avviata == 0)
-		 printf("> ");
+		 {
+		   timeout.tv_sec=0;
+		   timeout.tv_usec=0;
+		   printf("> ");
+		 }
 	       else
-		 printf("# ");
+		 {
+		   timeout.tv_sec=60;
+		   timeout.tv_usec=0;
+		   printf("# ");
+		 }
 	       fflush(stdout);
 	       fd = fd_master;
-	       if(select(fdmax+1,&fd,NULL,NULL,NULL) == -1)
+	       if((ret = select(fdmax+1,&fd,NULL,NULL,timeout)) == -1)
 		 {
 		   perror("select() error");
 		   exit(1);
+		 }
+	       if(ret == 0)
+		 {
+		   printf("disconnessione automatica\r\n");
+		   FD_CLR(udpsk,&fd_master);
+	           fdmax = sk;
+      		   close(udpsk);
+	   	   free(game);
+	      	   partita_avviata = 0;
+		   send_op(5,sk);
 		 }
 	       if(FD_ISSET(sk,&fd))
 		 {
