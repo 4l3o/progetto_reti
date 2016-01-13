@@ -89,6 +89,8 @@ int main (int argc  ,char*argv[] )
 		   printf("disconnessione automatica\r\n");
 		   FD_CLR(udpsk,&fd_master);
 	           fdmax = sk;
+		   int op =7;
+		   sendto(udpsk,&op,sizeof(int),0,(struct sockaddr*)&client_addr,sizeof(client_addr));		
       		   close(udpsk);
 	   	   free(game);
 	      	   partita_avviata = 0;
@@ -142,6 +144,16 @@ int main (int argc  ,char*argv[] )
 		       recvfrom(udpsk,&op,sizeof(int),0,(struct sockaddr*)&rec,&sl);
 		       switch(op)
 			 {
+			 case 0:
+			   {
+			     printf("disconnessione automatica\r\n");
+			     FD_CLR(udpsk,&fd_master);
+			     fdmax = sk;
+			     close(udpsk);
+			     free(game);
+			     partita_avviata = 0;
+			     send_op(5,sk);
+			   }
 			 case 5:
 			   {
 			   //disconnect
