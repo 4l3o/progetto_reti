@@ -62,34 +62,39 @@ int main (int argc  ,char*argv[] )
 	  FD_SET(sk,&fd_master);
 	  int fdmax = sk;
 	  struct timeval timeout;
+	  timeout.tv_sec = 60;
+	  timeout.tv_usec = 0;
 	  helper();
 	  while(loopCond == 0)
 	     {
+	       struct timeval * mytimeout;
 	       if(partita_avviata == 0)
 		 {
-		   timeout.tv_sec=0;
-		   timeout.tv_usec=0;
+		   mytimeout = NULL; 
+		   //timeout.tv_sec=0;
+		   // timeout.tv_usec=0;
 		   printf("> ");
 		 }
 	       else
 		 {
-		   timeout.tv_sec=60;
-		   timeout.tv_usec=0;
+		   mytimeout = &timeout;
+		   //timeout.tv_sec=60;
+		   //timeout.tv_usec=0;
 		   printf("# ");
 		 }
 	       fflush(stdout);
 	       fd = fd_master;
-	       if((ret = select(fdmax+1,&fd,NULL,NULL,timeout)) == -1)
+	       if((ret = select(fdmax+1,&fd,NULL,NULL,mytimeout)) == -1)
 		 {
 		   perror("select() error");
 		   exit(1);
 		 }
-	       if(ret == 0)
+	       if(ret == 0 && partita_avviata == 1)
 		 {
 		   printf("disconnessione automatica\r\n");
 		   FD_CLR(udpsk,&fd_master);
 	           fdmax = sk;
-		   int op =7;
+		   int op =0;
 		   sendto(udpsk,&op,sizeof(int),0,(struct sockaddr*)&client_addr,sizeof(client_addr));		
       		   close(udpsk);
 	   	   free(game);

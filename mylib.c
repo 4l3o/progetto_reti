@@ -320,11 +320,11 @@ void show_map(partita * pointer)
       int j = i+97;
       if(i == 0)
 	{
-	  printf("  %c ",(char)j);
+	  printf("   %c  ",(char)j);
 	}
       else
 	{
-	  printf("%c ",(char)j);
+	  printf(" %c  ",(char)j);
 	}
     }
    printf("\r\n");
