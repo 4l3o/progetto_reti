@@ -55,10 +55,10 @@ int serverInit(struct sockaddr_in * myaddr , int*listeningSk , char*ip, char*por
   return 0;
 }
 
-void rimuovi_utente(int sk ,user * testa)
+void rimuovi_utente(int sk ,user ** testa)
 {
   user* prec , *target;
-   for(user*i=testa;i!=NULL;i=i->next)
+   for(user*i=*testa;i!=NULL;i=i->next)
     {
       
       if(sk == i->sk)
@@ -68,12 +68,12 @@ void rimuovi_utente(int sk ,user * testa)
 	}
 	  prec = i;
     }
-   if(target == testa)
+   if(target == *testa)
      {
        user * temp;
        temp = target->next;
        free(target);
-       testa = temp;
+       *testa = temp;
      }
    else
      {

@@ -40,7 +40,7 @@ int main (int argc  ,char*argv[] )
 	  printf("Inserisci il tuo nome (max 20 caratteri):\r\n> ");
 	  fgets(cmnd_string,20,stdin);
 	  sscanf(cmnd_string,"%19s%n",usrName,&len);
-	  printf("%i\r\n",len);
+	  // printf("%i\r\n",len);
 	  printf("Inserisci la porta UDP di ascolto:\r\n> ");
 	  fgets(cmnd_string,24,stdin);
 	  sscanf(cmnd_string,"%4i",&udpPort);
@@ -108,8 +108,8 @@ int main (int argc  ,char*argv[] )
 		   //chiedere all'utente se vuole accettare la partita
 		   recv(sk,&len,sizeof(int),0);
 		   recv(sk,nome,len*sizeof(char),0);
-		   printf("\r\n%s ti ha invitato a giocare , vuoi accettare la partita?(y/n)\r\n>",nome);
-		   fflush(stdout);
+		   printf("\r\n%s ti ha invitato a giocare , vuoi accettare la partita?(y/n)\r\n> ",nome);
+		   //fflush(stdout);
 		   int risposta_corretta = 0;
 		   char risposta; 
 		   while(risposta_corretta == 0)
@@ -119,10 +119,11 @@ int main (int argc  ,char*argv[] )
 			 risposta_corretta = 1;
 		       else
 			 {
-			   printf("risposta non valida , inserire y se si vuole accettare o n altrimenti \r\n>");
-			   fflush(stdout);
+			   printf("risposta non valida , inserire y se si vuole accettare o n altrimenti \r\n> ");
+			   // fflush(stdout);
 			 }
 		     }
+		   fgets(cmnd_string ,25 , stdin);
 		   int codifica = codifica_risposta(risposta);
 		   send(sk,&codifica,sizeof(int),0);
 		   if(codifica == 1)
@@ -179,10 +180,10 @@ int main (int argc  ,char*argv[] )
 			     recvfrom(udpsk,&col,sizeof(char),0,(struct sockaddr*)&rec,&sl);
 			     int pl2symb = (game->symbol == 0)?1:0;
 			     insert(col ,pl2symb,game);
-			     printf("inserito gettone in %c",col);
+			     printf("\r\ninserito gettone in %c:",col);
 			     if(winner(col,game))
 			       {
-				 printf("hai perso\r\n");
+				 printf(" hai perso\r\n");
 				 send_op(5,sk);
 				 close(udpsk);
 				 FD_CLR(udpsk,&fd_master);
@@ -193,7 +194,7 @@ int main (int argc  ,char*argv[] )
 			     else
 			       {
 				 game ->turn =1;
-				 printf("è il tuo turno\r\n ");
+				 printf(" è il tuo turno\r\n");
 			       }
 			     break;
 			   }
@@ -203,6 +204,7 @@ int main (int argc  ,char*argv[] )
 	       if(FD_ISSET(0,&fd))
 		 {
 		   fgets(cmnd_string , 25 , stdin);
+		   //printf(" debug --- > %s\r\n",cmnd_string);
 		   int action ;
 		   char argument[10];
 		   action = parse_cmd_strng(cmnd_string);
@@ -259,7 +261,7 @@ int main (int argc  ,char*argv[] )
 			     //!connect
 			     int diff;
 			     sscanf(cmnd_string,"%*s %n%s%n",&diff,argument,&len);
-			     printf("%s : %i\r\n",argument,len-diff);
+			     //printf("%s : %i\r\n",argument,len-diff);
 			     send_op(4,sk);
 			     int invio = len-diff;
 			     //send(sk,&invio,sizeof(int),0);
@@ -284,25 +286,25 @@ int main (int argc  ,char*argv[] )
 				 FD_SET(udpsk,&fd_master);
 				 fdmax = (udpsk > fdmax) ?udpsk :fdmax;
 				 game = init_game_structure(1,1);
-				 show_map(game);
+				 //show_map(game);
 				 partita_avviata = 1;
-				 printf("partita avviata: è il tuo turno\r\n ");
+				 printf("partita avviata: è il tuo turno\r\n");
 			       }
 			   }
 		       break;
 		       }
 		     case 5:
 		       {
-			 if(partita_avviata == 1)
+		         if(partita_avviata == 1)
 			   {
-			     int op = 1;
+			     int op = 5;
 			     sendto(udpsk,&op,sizeof(int),0,(struct sockaddr*)&client_addr,sizeof(client_addr));
 			     printf("ti sei arreso\r\n");
-			     free(game);
-			      FD_CLR(udpsk,&fd_master);
-			     fdmax = sk;
-			     close(udpsk);
 			     send_op(5,sk);
+			     FD_CLR(udpsk,&fd_master);
+			     close(udpsk);
+			     fdmax=sk;
+			     free(game);
 			     partita_avviata = 0;
 			   }
 			 else
@@ -322,7 +324,7 @@ int main (int argc  ,char*argv[] )
 		       {
 			 if(partita_avviata == 0)
 			   {
-			     printf("devi prima avviare una èartita per poter eseguire questo comando");
+			     printf("devi prima avviare una èartita per poter eseguire questo comando\r\n");
 			   }
 			 else
 			   {

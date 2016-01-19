@@ -79,7 +79,7 @@ int main (int argc , char*argv[])
 			 {
 			   user*temp = cerca_utente_sk(i,listautenti);
 			   printf("%s si è disconnesso\r\n",temp->nome);
-			   rimuovi_utente(i , listautenti);
+			   rimuovi_utente(i , &listautenti);
 			   FD_CLR(i,&master);
 			   close(i);
 			   break;

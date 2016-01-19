@@ -33,7 +33,7 @@ int init_srvr_addr(struct sockaddr_in*srvr_addr , char*ip , char*port)
 
 int parse_cmd_strng(char * string)
 {
-  char command [10];
+  char command [15];
   sscanf(string , "%s" , command);
   if(strcmp(command ,"!quit") == 0)
     {
