@@ -44,15 +44,19 @@ int main (int argc  ,char*argv[] )
 	  printf("Inserisci la porta UDP di ascolto:\r\n> ");
 	  fgets(cmnd_string,24,stdin);
 	  sscanf(cmnd_string,"%4i",&udpPort);
-	  //srvrSend(1 ,usrName ,len ,sk);
-	  //send_op(1,sk);
-	  // printf("%i\r\n",len);
 	  //invio la porta
 	  send_len(udpPort,sk);
 	  //invio la lunghezza
 	  send_len(len+1,sk);
 	  //invio il messaggio
 	  send_msg(len+1,sk,usrName);
+	  int a;
+	  recv(sk,&a,sizeof(int),0);
+	  if(a == 0)
+	    {
+	      printf("username gia esistente\r\n");
+	      exit(1);
+	    }
 	  int loopCond = 0;
 	  partita * game;
 	  fd_set fd_master,fd;
@@ -214,7 +218,7 @@ int main (int argc  ,char*argv[] )
 		       {
 			 if(partita_avviata == 1)
 			   {
-			     printf("devi prima disconnetterti dalla partita , usa il comando !disconnect");
+			     printf("devi prima disconnetterti dalla partita , usa il comando !disconnect\r\n");
 			   }
 			 else
 			   {
@@ -273,6 +277,8 @@ int main (int argc  ,char*argv[] )
 			       printf("%s nome inesistente\r\n",argument);
 			     else if(risposta == -2)
 			       printf("%s gia' impegnato in una partita\r\n",argument);
+			     else if(risposta == -3)
+			       printf("non puoi iniziare una partita con te stesso!!\r\n");
 			     else if(risposta == 0)
 			       printf("l'utente %s ha rifiutato la partita\r\n",argument);
 			     else
@@ -334,23 +340,30 @@ int main (int argc  ,char*argv[] )
 			       {
 				 char col;
 				 sscanf(cmnd_string ,"%*s %c",&col);
-				 insert(col ,game->symbol, game);
-				 int op =7;
-				 sendto(udpsk,&op,sizeof(int),0,(struct sockaddr*)&client_addr,sizeof(client_addr));
-				 sendto(udpsk,&col,sizeof(char),0,(struct sockaddr*)&client_addr,sizeof(client_addr));
-				 if(winner(col , game))
+				 if(((int)col-97)<0 || ((int)col-97)>6)
 				   {
-				   printf("hai vinto la partita!\r\n");
-				   send_op(5,sk);
-				   FD_CLR(udpsk,&fd_master);
-				   close(udpsk);
-				   fdmax=sk;
-				   free(game);
-				   partita_avviata = 0;
+				     printf("la colonna inserita non è corretta , inserire una lettera compresa tra a e g\r\n");
 				   }
 				 else
 				   {
-				     game ->turn = 0;
+				     insert(col ,game->symbol, game);
+				     int op =7;
+				     sendto(udpsk,&op,sizeof(int),0,(struct sockaddr*)&client_addr,sizeof(client_addr));
+				     sendto(udpsk,&col,sizeof(char),0,(struct sockaddr*)&client_addr,sizeof(client_addr));
+				     if(winner(col , game))
+				       {
+					 printf("hai vinto la partita!\r\n");
+					 send_op(5,sk);
+					 FD_CLR(udpsk,&fd_master);
+					 close(udpsk);
+					 fdmax=sk;
+					 free(game);
+					 partita_avviata = 0;
+				       }
+				     else
+				       {
+					 game ->turn = 0;
+				       }
 				   }
 			       }
 			   }

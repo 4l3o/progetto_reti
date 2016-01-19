@@ -55,14 +55,24 @@ int main (int argc , char*argv[])
 		    }
 		  else
 		    {
-		      FD_SET(newsk , &master);
-		      fdmax = (newsk > fdmax)?newsk:fdmax;
 		      recv(newsk,&udpport,sizeof(int),0);
 		      recv(newsk,&len,sizeof(int),0);
 		      recv(newsk,username,len*(sizeof(char)),0);
-		      listautenti=nuovo_utente(listautenti,username,newsk,udpport,&cl_addr,0);
-		      printf("%s si e' connesso\r\n",listautenti->nome);
-		      printf("%s e' disponibile\r\n",listautenti->nome);
+		      if(cerca_utente(username,listautenti) != NULL)
+			{
+			  int ok =0;
+			  send(newsk,&ok,sizeof(int),0);
+			}
+		      else
+			{
+			  FD_SET(newsk , &master);
+			  fdmax = (newsk > fdmax)?newsk:fdmax;
+			  listautenti=nuovo_utente(listautenti,username,newsk,udpport,&cl_addr,0);
+			  int ok =1;
+			  send(newsk,&ok,sizeof(int),0);
+			  printf("%s si e' connesso\r\n",listautenti->nome);
+			  printf("%s e' disponibile\r\n",listautenti->nome);
+			}
 		    }
 		}
 	      else
@@ -94,7 +104,7 @@ int main (int argc , char*argv[])
 			   {
 			     for(user*k=listautenti;k!=NULL;k=k->next)
 			       {
-				 printf("%s : %i\r\n",k->nome , k->stato);
+				 //printf("%s : %i\r\n",k->nome , k->stato);
 				 //printf("%s\r\n",k->nome);
 				 int len = sizeof(k->nome)/sizeof(k->nome[0]);
 				 send(i,&len,sizeof(int),0);
@@ -107,7 +117,7 @@ int main (int argc , char*argv[])
 			 {
 			   int len;
 			   recv(i,&len,sizeof(int),0);
-			   printf("caratteri da leggere:%i\r\n",len);
+			   //printf("caratteri da leggere:%i\r\n",len);
 			   recv(i,username,len*(sizeof(char)),0);
 			   printf("utente richiesto %s\r\n",username);
 			   user*target=cerca_utente(username,listautenti);
@@ -121,6 +131,11 @@ int main (int argc , char*argv[])
 			       if(target->stato == 1)
 				 {
 				   len = -2;
+				   send(i,&len,sizeof(int),0);
+				 }
+			       else if(target->sk == i)
+				 {
+				   len = -3;
 				   send(i,&len,sizeof(int),0);
 				 }
 			       else
@@ -166,5 +181,4 @@ int main (int argc , char*argv[])
 	    }
 	}
     }
-  
-}
+  }
