@@ -16,7 +16,7 @@ int main (int argc  ,char*argv[] )
   int ret, sk ,udpsk , c_udpport;
   if(argc < 3)
     {
-      printf("argomenti mancanti!!");
+      printf("argomenti mancanti!\r\n forza_client <server_ip> <server_port>\r\n");
       return 1;
     }
   else
@@ -141,6 +141,7 @@ int main (int argc  ,char*argv[] )
 		       FD_SET(udpsk,&fd_master);
 		       fdmax = (udpsk > fdmax) ?udpsk :fdmax;
 		       game = init_game_structure(0,0);
+		       printf("partita avviata : è il turno del tuo avversario\r\n");
 		       partita_avviata = 1;
 		     }
 	       }
@@ -167,7 +168,7 @@ int main (int argc  ,char*argv[] )
 			 case 5:
 			   {
 			   //disconnect
-			     printf("hai vinto!\r\n");
+			     printf("l'avversario si è arreso : hai vinto!\r\n");
 			     FD_CLR(udpsk,&fd_master);
 			     fdmax = sk;
 			     close(udpsk);
@@ -272,6 +273,7 @@ int main (int argc  ,char*argv[] )
 			     send_len(len-diff+1,sk);
 			     send_msg(len-diff+1,sk,argument);
 			     int risposta ;
+			     printf("attendo la risposta dell'utente\r\n");
 			     recv(sk,&risposta,sizeof(int),0);
 			     if(risposta == -1)
 			       printf("%s nome inesistente\r\n",argument);
@@ -330,7 +332,7 @@ int main (int argc  ,char*argv[] )
 		       {
 			 if(partita_avviata == 0)
 			   {
-			     printf("devi prima avviare una èartita per poter eseguire questo comando\r\n");
+			     printf("devi prima avviare una partita per poter eseguire questo comando\r\n");
 			   }
 			 else
 			   {

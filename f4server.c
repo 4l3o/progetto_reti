@@ -17,7 +17,7 @@ int main (int argc , char*argv[])
   int sk, cn_sk , ret ,fdmax;
   if(argc < 3)
     {
-      printf("Argomenti mancanti");
+      printf("Argomenti mancanti!\r\n forza_server <server_ip> <server_port>\r\n");
       return 1;
     }
   ret = serverInit( &myaddr , &sk ,argv[1],argv[2]);
@@ -98,7 +98,7 @@ int main (int argc , char*argv[])
 		       case 3:
 			 {
 			 int usrnumber = count_list(listautenti);
-			 printf("%i",usrnumber);
+			 //printf("%i",usrnumber);
 			 send(i,&usrnumber,sizeof(int),0);
 			 if(usrnumber >0)
 			   {
@@ -119,8 +119,9 @@ int main (int argc , char*argv[])
 			   recv(i,&len,sizeof(int),0);
 			   //printf("caratteri da leggere:%i\r\n",len);
 			   recv(i,username,len*(sizeof(char)),0);
-			   printf("utente richiesto %s\r\n",username);
+			   //printf("utente richiesto %s\r\n",username);
 			   user*target=cerca_utente(username,listautenti);
+			   
 			   if(!target)
 			     {
 			       len = -1;
@@ -150,6 +151,7 @@ int main (int argc , char*argv[])
 				   send(i,&risposta,sizeof(int),0);
 				   if(risposta == 1)
 				     {
+				       printf("l'utente %s si è connesso con %s \r\n",sender->nome,target->nome);
 				       send(i,&target->udpport,sizeof(int),0);
 				       send(target->sk,&sender->udpport,sizeof(int),0);
 				       int ipaddr = target->indirizzo.sin_addr.s_addr;
@@ -168,6 +170,7 @@ int main (int argc , char*argv[])
 			 {
 			   user * temp = cerca_utente_sk(i,listautenti);
 			   temp ->stato =0;
+			   printf("l'utente %s è nuovamente disponibile\r\n",temp->nome);
 			   break;
 			 }
 		      
