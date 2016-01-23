@@ -14,7 +14,7 @@ int main (int argc , char*argv[])
 {
   user * listautenti=NULL;
   struct sockaddr_in myaddr , cl_addr;
-  int sk, cn_sk , ret ,fdmax;
+  int sk, ret ,fdmax;
   if(argc < 3)
     {
       printf("Argomenti mancanti!\r\n forza_server <server_ip> <server_port>\r\n");
@@ -39,7 +39,8 @@ int main (int argc , char*argv[])
 	  perror("server select error");
 	  exit(1);
 	}
-      for(int i=0;i<=fdmax;i++)
+      int i;
+      for(i=0;i<=fdmax;i++)
 	{
 	  if(FD_ISSET(i,&slave))
 	    {
@@ -102,7 +103,8 @@ int main (int argc , char*argv[])
 			 send(i,&usrnumber,sizeof(int),0);
 			 if(usrnumber >0)
 			   {
-			     for(user*k=listautenti;k!=NULL;k=k->next)
+			     user*k;
+			     for(k=listautenti;k!=NULL;k=k->next)
 			       {
 				 //printf("%s : %i\r\n",k->nome , k->stato);
 				 //printf("%s\r\n",k->nome);
@@ -184,4 +186,5 @@ int main (int argc , char*argv[])
 	    }
 	}
     }
+  return 0;
   }

@@ -58,7 +58,9 @@ int serverInit(struct sockaddr_in * myaddr , int*listeningSk , char*ip, char*por
 void rimuovi_utente(int sk ,user ** testa)
 {
   user* prec , *target;
-   for(user*i=*testa;i!=NULL;i=i->next)
+  target = NULL;
+  user*i;
+   for(i=*testa;i!=NULL;i=i->next)
     {
       
       if(sk == i->sk)
@@ -85,7 +87,8 @@ void rimuovi_utente(int sk ,user ** testa)
 
 user* cerca_utente(char*username , user*testa)
 {
-  for(user*i=testa;i!=NULL;i=i->next)
+  user*i;
+  for(i=testa;i!=NULL;i=i->next)
     {
       if(strcmp(i->nome,username)==0)
 	{
@@ -98,7 +101,8 @@ user* cerca_utente(char*username , user*testa)
 
 user* cerca_utente_sk(int sk , user*testa)
 {
-  for(user*i=testa;i!=NULL;i=i->next)
+  user*i;
+  for(i=testa;i!=NULL;i=i->next)
     {
       if(sk == i->sk)
 	return i;
@@ -110,7 +114,8 @@ int count_list(user*testa)
 {
   //printf("conto il numero di utenti \r\n");
   int risultato = 0;
-  for(user*i=testa;i!=NULL;i=i->next)
+  user*i;
+  for(i=testa;i!=NULL;i=i->next)
     {
       // printf("%s",i->nome);
       risultato ++ ;

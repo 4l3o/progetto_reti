@@ -8,7 +8,7 @@
 #include<sys/types.h>
 #include<sys/socket.h>
 #include<arpa/inet.h>
-#include"myLib.h"
+#include "clientlib.h"
 
 int main (int argc  ,char*argv[] )
 {
@@ -243,7 +243,8 @@ int main (int argc  ,char*argv[] )
 		       if(number >0)
 			 {
 			   printf("sono disponibili %i  utenti:\r\n",number);
-			   for(int i = 0;i< number ;i++)
+			   int i;
+			   for(i = 0;i< number ;i++)
 			     {
 			       recv(sk,&len,sizeof(int),0);
 			       //printf("len : %i",len);
@@ -268,7 +269,6 @@ int main (int argc  ,char*argv[] )
 			     sscanf(cmnd_string,"%*s %n%s%n",&diff,argument,&len);
 			     //printf("%s : %i\r\n",argument,len-diff);
 			     send_op(4,sk);
-			     int invio = len-diff;
 			     //send(sk,&invio,sizeof(int),0);
 			     send_len(len-diff+1,sk);
 			     send_msg(len-diff+1,sk,argument);
@@ -386,4 +386,5 @@ int main (int argc  ,char*argv[] )
 	}
       
     }
+  return 0;
 }

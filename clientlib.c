@@ -174,9 +174,10 @@ partita* init_game_structure(int symbol,int turn)
   partita * nuova = (partita*)malloc(sizeof(partita));
   nuova ->turn =turn;
   nuova ->symbol = symbol;
-  for(int i = 0;i<6;i++)
+  int i,j;
+  for(i = 0;i<6;i++)
     {
-      for(int j = 0;j<7;j++)
+      for(j = 0;j<7;j++)
 	{
 	  //printf("i:%i j%i ",i,j);
 	  nuova->grid[i][j]=-1;
@@ -241,7 +242,8 @@ int winner(char col,partita * pointer)
 {
   int colonna = (int)col-97;
   int riga;
-  for(int i = 0 ; i<6;i++)
+  int i;
+  for(i = 0 ; i<6;i++)
     {
       if(pointer->grid[i][colonna] !=-1)
 	riga = i;
@@ -257,7 +259,6 @@ int winner(char col,partita * pointer)
 
 int insert(char col ,int symbol, partita*pointer)
 {
-  int inserimento;
   int colonna;
   colonna = (int)col -97;
   //printf("colonna :%i\r\n",colonna);
@@ -274,7 +275,8 @@ int insert(char col ,int symbol, partita*pointer)
 }
 void print_line()
 {
-  for(int i=0;i<8;i++)
+  int i;
+  for(i=0;i<8;i++)
     {
       if(i==0)
 	printf("  ");
@@ -287,9 +289,10 @@ void show_map(partita * pointer)
 {
   printf("\r\n");
   print_line();
-  for(int i =6 ; i>0;i--)
+  int i,j;
+  for(i =6 ; i>0;i--)
     {
-      for(int j = 0;j<8;j++)
+      for(j = 0;j<8;j++)
 	{
 	  if(j==0 )
 	    {
@@ -315,9 +318,10 @@ void show_map(partita * pointer)
       printf("\r\n");
       print_line();
     }
-   for(int i = 0;i<7;i++)
+   int h;
+   for( h = 0;h<7;h++)
     {
-      int j = i+97;
+      int j = h+97;
       if(i == 0)
 	{
 	  printf("   %c  ",(char)j);
