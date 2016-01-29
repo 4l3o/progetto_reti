@@ -322,7 +322,7 @@ void show_map(partita * pointer)
    for( h = 0;h<7;h++)
     {
       int j = h+97;
-      if(i == 0)
+      if(h == 0)
 	{
 	  printf("   %c  ",(char)j);
 	}

@@ -164,6 +164,7 @@ int main (int argc  ,char*argv[] )
 			     free(game);
 			     partita_avviata = 0;
 			     send_op(5,sk);
+			     break;
 			   }
 			 case 5:
 			   {
@@ -185,7 +186,7 @@ int main (int argc  ,char*argv[] )
 			     recvfrom(udpsk,&col,sizeof(char),0,(struct sockaddr*)&rec,&sl);
 			     int pl2symb = (game->symbol == 0)?1:0;
 			     insert(col ,pl2symb,game);
-			     printf("\r\ninserito gettone in %c:",col);
+			     printf("\r\n l'avversario ha inserito un gettone in %c:",col);
 			     if(winner(col,game))
 			       {
 				 printf(" hai perso\r\n");
@@ -323,8 +324,10 @@ int main (int argc  ,char*argv[] )
 		       }
 		     case 6:
 		       {
-			 //show_map
-			 show_map(game);
+			 if(partita_avviata == 1)
+			   show_map(game);
+			 else
+			   printf("per eseguire questo comando devi essere all'interno di una partita\r\n");
 		       
 		       break;
 		       }
@@ -352,6 +355,7 @@ int main (int argc  ,char*argv[] )
 				     int op =7;
 				     sendto(udpsk,&op,sizeof(int),0,(struct sockaddr*)&client_addr,sizeof(client_addr));
 				     sendto(udpsk,&col,sizeof(char),0,(struct sockaddr*)&client_addr,sizeof(client_addr));
+				     printf("hai inserito un getto in %c :",col);
 				     if(winner(col , game))
 				       {
 					 printf("hai vinto la partita!\r\n");
@@ -365,6 +369,7 @@ int main (int argc  ,char*argv[] )
 				     else
 				       {
 					 game ->turn = 0;
+					 printf("è il turno del tuo avversario\r\n");
 				       }
 				   }
 			       }
